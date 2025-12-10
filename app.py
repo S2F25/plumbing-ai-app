@@ -106,22 +106,18 @@ def get_ai_diagnosis(api_key, image_file, answers, rules):
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.title("⚙️ System Config")
-    api_key = st.text_input("OpenAI API Key", type="password")
+    st.title("⚙️ Snap2Fix Configuration")
     
-    st.divider()
-    st.subheader("🧠 Learned Logic")
-    if st.session_state.learned_rules:
-        for rule in st.session_state.learned_rules:
-            st.markdown(f"✅ *{rule}*")
+    # 1. Try to load key from Secrets (Secure Mode)
+    if "OPENAI_API_KEY" in st.secrets:
+        api_key = st.secrets["OPENAI_API_KEY"]
+        st.success("✅ Licensed Access Active")
     else:
-        st.info("No corrections learned yet.")
-    
-    if st.button("Restart Session"):
-        st.session_state.step = 1
-        st.session_state.answers = {}
-        st.rerun()
+        # 2. Fallback: Ask user for key (Public Mode)
+        api_key = st.text_input("Enter OpenAI API Key", type="password")
+        st.warning("No license found. Running in Guest Mode.")
 
+    st.divider()
 # --- MAIN APP FLOW ---
 st.markdown('<div class="big-header">🪠 Plumbing Forensics AI 2.0</div>', unsafe_allow_html=True)
 st.progress(st.session_state.step * 25)
